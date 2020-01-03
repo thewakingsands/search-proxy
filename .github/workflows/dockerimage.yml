@@ -9,5 +9,5 @@ jobs:
       uses: elgohr/Publish-Docker-Github-Action@master
       with:
         name: thewakingsands/search-proxy/app
-        username: ${{ GITHUB_ACTOR }}
+        username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
