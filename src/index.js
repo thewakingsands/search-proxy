@@ -8,6 +8,8 @@ app.use(require('body-parser').json({
 }))
 
 app.get('/s', (req, res) => {
+  res.header('Access-Control-Allow-Origin', '*')
+
   const elasticsearch = new Elasticsearch.Client({
     host: process.env.ELASTICSEARCH
   })
