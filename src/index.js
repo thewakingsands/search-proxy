@@ -2,6 +2,8 @@ require('dotenv').config()
 const express = require('express')
 const Elasticsearch = require('elasticsearch')
 
+const metrics = require('./metrics')
+
 const app = express()
 app.use(require('body-parser').json({
   limit: '5mb'
@@ -44,6 +46,7 @@ app.get('/s', (req, res) => {
     body
   }, (err, result) => {
     if (err != null) {
+      metrics.logSearch(word, from, 0, 0)
       res.status(500).json({ error: err })
       return
     }
@@ -59,6 +62,7 @@ app.get('/s', (req, res) => {
         }
       })
   
+      metrics.logSearch(word, from, 1, result.hits.total)
       res.status(200).json({
         total: result.hits.total,
         pageSize,
@@ -67,6 +71,7 @@ app.get('/s', (req, res) => {
       })
     } catch (err) {
       console.error(err)
+      metrics.logSearch(word, from, 0, 0)
       res.status(500).json({ error: err })
     }
   })
@@ -141,6 +146,10 @@ app.put('/index', async (req, res) => {
   }
 })
 
-app.listen(process.env.PORT, () => {
-  console.log(`Server listened on port ${process.env.PORT}`)
+metrics.init()
+.then(() => {
+  app.listen(process.env.PORT, () => {
+    console.log(`Server listened on port ${process.env.PORT}`)
+  })
 })
+.catch(console.error)
